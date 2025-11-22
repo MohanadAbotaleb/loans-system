@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1763846525341" clover="3.2.0">
-  <project timestamp="1763846525342" name="All files">
-    <metrics statements="394" coveredstatements="292" conditionals="142" coveredconditionals="110" methods="68" coveredmethods="43" elements="604" coveredelements="445" complexity="0" loc="394" ncloc="394" packages="14" files="28" classes="28"/>
+<coverage generated="1763852569431" clover="3.2.0">
+  <project timestamp="1763852569432" name="All files">
+    <metrics statements="394" coveredstatements="290" conditionals="142" coveredconditionals="110" methods="68" coveredmethods="42" elements="604" coveredelements="442" complexity="0" loc="394" ncloc="394" packages="14" files="28" classes="28"/>
     <package name="src">
       <metrics statements="37" coveredstatements="9" conditionals="4" coveredconditionals="3" methods="4" coveredmethods="3"/>
       <file name="app.controller.ts" path="/home/mohanad/Documents/GitHub/loans-system/backend/src/app.controller.ts">
@@ -132,16 +132,16 @@
       </file>
     </package>
     <package name="src.modules.disbursements">
-      <metrics statements="66" coveredstatements="54" conditionals="24" coveredconditionals="18" methods="9" coveredmethods="6"/>
+      <metrics statements="66" coveredstatements="52" conditionals="24" coveredconditionals="18" methods="9" coveredmethods="5"/>
       <file name="disbursements.controller.ts" path="/home/mohanad/Documents/GitHub/loans-system/backend/src/modules/disbursements/disbursements.controller.ts">
-        <metrics statements="16" coveredstatements="10" conditionals="14" coveredconditionals="9" methods="4" coveredmethods="1"/>
+        <metrics statements="16" coveredstatements="8" conditionals="14" coveredconditionals="9" methods="4" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
         <line num="5" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
-        <line num="10" count="1" type="cond" truecount="6" falsecount="2"/>
-        <line num="11" count="1" type="stmt"/>
+        <line num="10" count="0" type="cond" truecount="6" falsecount="2"/>
+        <line num="11" count="0" type="stmt"/>
         <line num="15" count="1" type="cond" truecount="3" falsecount="1"/>
         <line num="16" count="0" type="stmt"/>
         <line num="20" count="1" type="stmt"/>
