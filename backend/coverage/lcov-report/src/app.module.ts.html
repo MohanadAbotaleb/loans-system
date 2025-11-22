@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>0/14</span>
             </div>
         
             
@@ -88,7 +88,17 @@
 <a name='L23'></a><a href='#L23'>23</a>
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -98,6 +108,16 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -117,25 +137,35 @@
 <span class="cstat-no" title="statement not covered" >import { ConfigModule } from '@nestjs/config';</span>
 <span class="cstat-no" title="statement not covered" >import { AppController } from './app.controller';</span>
 <span class="cstat-no" title="statement not covered" >import { AppService } from './app.service';</span>
-<span class="cstat-no" title="statement not covered" >import { DisbursementsModule } from './disbursements/disbursements.module';</span>
-<span class="cstat-no" title="statement not covered" >import { RepaymentsModule } from './repayments/repayments.module';</span>
-<span class="cstat-no" title="statement not covered" >import { RollbacksModule } from './rollbacks/rollbacks.module';</span>
-<span class="cstat-no" title="statement not covered" >import { AuditModule } from './audit/audit.module';</span>
-<span class="cstat-no" title="statement not covered" >import { LoansModule } from './loans/loans.module';</span>
+<span class="cstat-no" title="statement not covered" >import { DisbursementsModule } from './modules/disbursements/disbursements.module';</span>
+<span class="cstat-no" title="statement not covered" >import { RepaymentsModule } from './modules/repayments/repayments.module';</span>
+<span class="cstat-no" title="statement not covered" >import { RollbacksModule } from './modules/rollbacks/rollbacks.module';</span>
+<span class="cstat-no" title="statement not covered" >import { AuditModule } from './modules/audit/audit.module';</span>
+<span class="cstat-no" title="statement not covered" >import { LoansModule } from './modules/loans/loans.module';</span>
 <span class="cstat-no" title="statement not covered" >import { PrismaModule } from './prisma/prisma.module';</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >import { HealthController } from './modules/health/health.controller';</span>
+<span class="cstat-no" title="statement not covered" >import { APP_INTERCEPTOR } from '@nestjs/core';</span>
+<span class="cstat-no" title="statement not covered" >import { LoggingInterceptor } from './common/interceptors/logging.interceptor';</span>
 &nbsp;
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot(),
     PrismaModule,
     DisbursementsModule,
     RepaymentsModule,
     RollbacksModule,
-    AuditModule,
     LoansModule,
+    AuditModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, HealthController],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
 })
 export <span class="cstat-no" title="statement not covered" >class <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >AppModule </span>{ }</span></span>
 &nbsp;</pre></td></tr></table></pre>
@@ -145,7 +175,7 @@ export <span class="cstat-no" title="statement not covered" >class <span class="
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-22T17:53:27.981Z
+                at 2025-11-22T21:22:05.300Z
             </div>
         <script src="../prettify.js"></script>
         <script>

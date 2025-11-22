@@ -87,7 +87,26 @@ describe('RollbacksService', () => {
           },
           payment: {
             findFirst: jest.fn().mockResolvedValue(mockPayment),
+            findMany: jest.fn().mockResolvedValue([]),
             update: jest.fn().mockResolvedValue({ ...mockPayment, status: 'rolled_back' }),
+          },
+          loan: {
+            findUnique: jest.fn().mockResolvedValue({
+              id: mockPayment.loanId,
+              amount: 10000,
+            }),
+          },
+          repaymentSchedule: {
+            findMany: jest.fn().mockResolvedValue([
+              {
+                id: 'schedule-1',
+                loanId: mockPayment.loanId,
+                principalAmount: 800,
+                status: 'pending',
+              },
+            ]),
+            update: jest.fn().mockResolvedValue({}),
+            count: jest.fn().mockResolvedValue(0),
           },
           rollbackRecord: {
             create: jest.fn().mockResolvedValue({
@@ -131,8 +150,13 @@ describe('RollbacksService', () => {
           disbursement: {
             findFirst: jest.fn().mockResolvedValue({
               id: testData.transactionId,
+              loanId: 'loan-123',
               status: 'rolled_back',
+              rolledBackAt: new Date(),
             }),
+          },
+          payment: {
+            findFirst: jest.fn().mockResolvedValue(null),
           },
         });
       });

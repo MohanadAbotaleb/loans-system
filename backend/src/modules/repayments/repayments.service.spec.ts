@@ -48,7 +48,13 @@ describe('RepaymentsService', () => {
             findUnique: jest.fn().mockResolvedValue({
               ...testLoan,
               payments: [],
+              disbursement: null,
             }),
+            update: jest.fn().mockResolvedValue({}),
+          },
+          payment: {
+            findMany: jest.fn().mockResolvedValue([]),
+            create: jest.fn().mockResolvedValue(mockPayment),
           },
           repaymentSchedule: {
             findMany: jest.fn().mockResolvedValue([
@@ -60,9 +66,8 @@ describe('RepaymentsService', () => {
                 status: 'pending',
               },
             ]),
-          },
-          payment: {
-            create: jest.fn().mockResolvedValue(mockPayment),
+            update: jest.fn().mockResolvedValue({}),
+            count: jest.fn().mockResolvedValue(0),
           },
           auditLog: {
             create: jest.fn().mockResolvedValue({}),
@@ -100,19 +105,26 @@ describe('RepaymentsService', () => {
             findUnique: jest.fn().mockResolvedValue({
               ...testLoan,
               payments: [],
+              disbursement: null,
             }),
+            update: jest.fn().mockResolvedValue({}),
+          },
+          payment: {
+            findMany: jest.fn().mockResolvedValue([]),
+            create: createPaymentSpy,
           },
           repaymentSchedule: {
             findMany: jest.fn().mockResolvedValue([
               {
+                id: 'schedule-1',
+                loanId: testLoan.id,
                 principalAmount: 800,
                 dueDate: new Date(Date.now() - 5 * 86400000), // 5 days late
                 status: 'pending',
               },
             ]),
-          },
-          payment: {
-            create: createPaymentSpy,
+            update: jest.fn().mockResolvedValue({}),
+            count: jest.fn().mockResolvedValue(0),
           },
           auditLog: {
             create: jest.fn().mockResolvedValue({}),
@@ -136,19 +148,26 @@ describe('RepaymentsService', () => {
             findUnique: jest.fn().mockResolvedValue({
               ...testLoan,
               payments: [],
+              disbursement: null,
             }),
+            update: jest.fn().mockResolvedValue({}),
+          },
+          payment: {
+            findMany: jest.fn().mockResolvedValue([]),
+            create: createPaymentSpy,
           },
           repaymentSchedule: {
             findMany: jest.fn().mockResolvedValue([
               {
+                id: 'schedule-1',
+                loanId: testLoan.id,
                 principalAmount: 1000,
                 dueDate: new Date(Date.now() - 5 * 86400000),
                 status: 'pending',
               },
             ]),
-          },
-          payment: {
-            create: createPaymentSpy,
+            update: jest.fn().mockResolvedValue({}),
+            count: jest.fn().mockResolvedValue(0),
           },
           auditLog: {
             create: jest.fn().mockResolvedValue({}),
@@ -173,19 +192,26 @@ describe('RepaymentsService', () => {
             findUnique: jest.fn().mockResolvedValue({
               ...testLoan,
               payments: [],
+              disbursement: null,
             }),
+            update: jest.fn().mockResolvedValue({}),
+          },
+          payment: {
+            findMany: jest.fn().mockResolvedValue([]),
+            create: jest.fn().mockResolvedValue({ id: 'payment-123' }),
           },
           repaymentSchedule: {
             findMany: jest.fn().mockResolvedValue([
               {
+                id: 'schedule-1',
+                loanId: testLoan.id,
                 principalAmount: 800,
                 dueDate: new Date(),
                 status: 'pending',
               },
             ]),
-          },
-          payment: {
-            create: jest.fn().mockResolvedValue({ id: 'payment-123' }),
+            update: jest.fn().mockResolvedValue({}),
+            count: jest.fn().mockResolvedValue(0),
           },
           auditLog: {
             create: createAuditSpy,

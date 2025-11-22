@@ -160,5 +160,110 @@ describe('DisbursementsService', () => {
         }),
       });
     });
+
+    it('should handle zero-interest loans', async () => {
+      const zeroInterestData = {
+        ...testData,
+        interestRate: 0,
+      };
+      const createManySpy = jest.fn().mockResolvedValue({ count: zeroInterestData.tenor });
+
+      prisma.$transaction.mockImplementation(async (callback) => {
+        return callback({
+          disbursement: {
+            findUnique: jest.fn().mockResolvedValue(null),
+            create: jest.fn().mockResolvedValue({
+              id: 'disbursement-123',
+              loanId: zeroInterestData.loanId,
+              amount: zeroInterestData.amount,
+              disbursementDate: new Date(),
+              status: 'completed',
+            }),
+          },
+          loan: {
+            findUnique: jest.fn().mockResolvedValue(null),
+            create: jest.fn().mockResolvedValue({
+              id: zeroInterestData.loanId,
+              status: 'active',
+            }),
+          },
+          repaymentSchedule: {
+            createMany: createManySpy,
+          },
+          auditLog: {
+            create: jest.fn().mockResolvedValue({}),
+          },
+        });
+      });
+
+      await service.disburseLoan(zeroInterestData);
+
+      expect(createManySpy).toHaveBeenCalled();
+      const scheduleData = createManySpy.mock.calls[0][0].data;
+      expect(scheduleData).toHaveLength(zeroInterestData.tenor);
+      expect(scheduleData[0].interestAmount).toBe(0);
+      expect(scheduleData[0].principalAmount).toBe(zeroInterestData.amount / zeroInterestData.tenor);
+    });
+
+    it('should use existing loan if it exists', async () => {
+      const existingLoan = {
+        id: testData.loanId,
+        borrowerId: testData.borrowerId,
+        amount: testData.amount,
+        interestRate: testData.interestRate,
+        tenor: testData.tenor,
+        status: 'active',
+      };
+      const findUniqueSpy = jest.fn().mockResolvedValue(existingLoan);
+
+      prisma.$transaction.mockImplementation(async (callback) => {
+        return callback({
+          disbursement: {
+            findUnique: jest.fn().mockResolvedValue(null),
+            create: jest.fn().mockResolvedValue({
+              id: 'disbursement-123',
+              status: 'completed',
+            }),
+          },
+          loan: {
+            findUnique: findUniqueSpy,
+          },
+          repaymentSchedule: {
+            createMany: jest.fn().mockResolvedValue({ count: 12 }),
+          },
+          auditLog: {
+            create: jest.fn().mockResolvedValue({}),
+          },
+        });
+      });
+
+      await service.disburseLoan(testData);
+
+      expect(findUniqueSpy).toHaveBeenCalledWith({ where: { id: testData.loanId } });
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all disbursements with count', async () => {
+      const mockDisbursements = [
+        {
+          id: 'disbursement-1',
+          loanId: 'loan-1',
+          amount: 10000,
+          status: 'completed',
+        },
+      ];
+
+      prisma.disbursement.count.mockResolvedValue(1);
+      prisma.disbursement.findMany.mockResolvedValue(mockDisbursements);
+
+      const result = await service.findAll();
+
+      expect(result.data).toEqual(mockDisbursements);
+      expect(result.count).toBe(1);
+      expect(prisma.disbursement.findMany).toHaveBeenCalledWith({
+        orderBy: { createdAt: 'desc' },
+      });
+    });
   });
 });
