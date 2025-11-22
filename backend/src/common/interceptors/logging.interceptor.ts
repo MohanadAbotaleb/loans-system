@@ -3,64 +3,57 @@ import {
     NestInterceptor,
     ExecutionContext,
     CallHandler,
+    Logger,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { AppLogger } from '../logger/app.logger';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-    constructor(private readonly logger: AppLogger) { }
+    private readonly logger = new Logger(LoggingInterceptor.name);
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-        if (context.getType() !== 'http') {
-            return next.handle();
-        }
+        const req = context.switchToHttp().getRequest();
+        const { method, url, body } = req;
+        const userAgent = req.get('user-agent') || '';
+        const transactionId = uuidv4();
 
-        const request = context.switchToHttp().getRequest();
-        const { method, url, body } = request;
-        const transactionId = request.headers['x-transaction-id'] || uuidv4();
-        request.headers['x-transaction-id'] = transactionId; // Attach for downstream use
+        // Attach transactionId to request for use in services
+        req.transactionId = transactionId;
 
         const now = Date.now();
-        this.logger.log(`Incoming Request: ${method} ${url}`, 'HTTP', {
+        this.logger.log({
+            message: 'Incoming Request',
             transactionId,
             method,
             url,
             body: this.sanitizeBody(body),
+            userAgent,
         });
 
-        return next.handle().pipe(
-            tap({
-                next: (data) => {
-                    this.logger.log(`Request Completed: ${method} ${url}`, 'HTTP', {
+        return next
+            .handle()
+            .pipe(
+                tap((data) => {
+                    const response = context.switchToHttp().getResponse();
+                    const delay = Date.now() - now;
+                    this.logger.log({
+                        message: 'Outgoing Response',
                         transactionId,
-                        duration: Date.now() - now,
-                        statusCode: context.switchToHttp().getResponse().statusCode,
+                        method,
+                        url,
+                        statusCode: response.statusCode,
+                        duration: `${delay}ms`,
                     });
-                },
-                error: (error) => {
-                    this.logger.error(`Request Failed: ${method} ${url}`, error.stack, 'HTTP', {
-                        transactionId,
-                        duration: Date.now() - now,
-                        error: error.message,
-                    });
-                },
-            }),
-        );
+                }),
+            );
     }
 
-    private sanitizeBody(body: any): any {
+    private sanitizeBody(body: any) {
         if (!body) return body;
         const sanitized = { ...body };
-        // Redact sensitive fields
-        const sensitiveFields = ['password', 'token', 'secret'];
-        sensitiveFields.forEach((field) => {
-            if (field in sanitized) {
-                sanitized[field] = '***';
-            }
-        });
+        // Redact sensitive fields if any
         return sanitized;
     }
 }

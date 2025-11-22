@@ -10,11 +10,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U admin -d loan_system" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   backend:
     build: ./backend
@@ -22,11 +17,9 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: postgresql://admin:password@postgres:5432/loan_system
-      NODE_ENV: production
     depends_on:
-      postgres:
-        condition: service_healthy
-    command: node dist/src/main.js
+      - postgres
+    command: sh -c "npx prisma migrate deploy && npm run start:prod"
 
   frontend:
     build: ./frontend
