@@ -21,9 +21,7 @@ export class RollbacksService {
 
         return await this.prisma.$transaction(async (prisma) => {
             // 1. Identify transaction type
-            const disbursement = await prisma.disbursement.findFirst({ where: { id: data.transactionId } }); // Assuming transactionId maps to ID for now, or we search by ID
-            // Actually, requirements say "transactionId" which could be disbursement ID or payment ID.
-            // Let's check both tables.
+            const disbursement = await prisma.disbursement.findFirst({ where: { id: data.transactionId } });
 
             let type: 'disbursement' | 'payment' | null = null;
             let originalRecord: any = null;
@@ -51,14 +49,9 @@ export class RollbacksService {
                 throw new BadRequestException('Transaction already rolled back');
             }
 
-            // 2. Perform compensating actions
             const compensatingActions: any[] = [];
 
             if (type === 'disbursement') {
-                // Reverse disbursement:
-                // - Mark disbursement as rolled_back
-                // - Cancel repayment schedules?
-                // - Update Loan status to cancelled?
 
                 await prisma.disbursement.update({
                     where: { id: originalRecord.id },
@@ -81,9 +74,7 @@ export class RollbacksService {
                 compensatingActions.push({ action: 'cancel_loan' });
 
             } else if (type === 'payment') {
-                // Reverse payment:
-                // - Mark payment as rolled_back
-                // - Revert repayment schedules by "replaying" remaining payments
+
 
                 await prisma.payment.update({
                     where: { id: originalRecord.id },
@@ -91,7 +82,6 @@ export class RollbacksService {
                 });
                 compensatingActions.push({ action: 'update_payment_status', status: 'rolled_back' });
 
-                // Get all non-rolled-back payments for this loan (excluding the current one)
                 const remainingPayments = await prisma.payment.findMany({
                     where: {
                         loanId: originalRecord.loanId,
@@ -157,7 +147,7 @@ export class RollbacksService {
                     originalOperation: type,
                     rollbackReason: data.reason,
                     compensatingActions: JSON.stringify(compensatingActions),
-                    rolledBackBy: 'system', // or user ID if available
+                    rolledBackBy: 'system',
                 }
             });
 

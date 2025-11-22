@@ -43,6 +43,7 @@ let RepaymentsService = RepaymentsService_1 = class RepaymentsService {
                 throw new common_1.BadRequestException('Cannot make payment on a rolled back loan');
             }
             if (loan.status !== 'active' && loan.status !== 'completed') {
+                throw new common_1.BadRequestException('Loan must be active to accept payments');
             }
             const payments = await prisma.payment.findMany({
                 where: { loanId: loan.id },

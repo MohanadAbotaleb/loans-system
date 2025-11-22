@@ -32,10 +32,7 @@ export class DisbursementsService {
                     throw new ConflictException('Loan already disbursed');
                 }
 
-                // Create Loan record if it doesn't exist (assuming loan creation happens here or prior)
-                // For this task, we'll assume we need to ensure the Loan exists or create it.
-                // Based on the schema, Disbursement relates to Loan.
-                // Let's check if Loan exists, if not create it (implied by requirements to "Disburse loans")
+                // Create Loan record if it doesn't exist
                 let loan = await prisma.loan.findUnique({ where: { id: data.loanId } });
                 if (!loan) {
                     loan = await prisma.loan.create({
@@ -94,14 +91,9 @@ export class DisbursementsService {
     private generateSchedule(data: CreateDisbursementDto, startDate: Date) {
         const schedule: Prisma.RepaymentScheduleCreateManyInput[] = [];
         const monthlyRate = data.interestRate / 12 / 100;
-        // Simple amortization for example, or flat rate as per requirements implication?
-        // Requirements say: "Calculate how much of payment goes to: principal, interest"
-        // "Interest accrues daily based on outstanding principal" -> This implies reducing balance.
-        // Let's use a standard PMT formula for equal monthly installments, or simple interest if not specified.
-        // "Monthly payment: ~$888.49" for 10k, 12%, 12m -> This is standard amortization.
-
         let currentDate = new Date(startDate);
 
+        // Handle zero-interest loans so that it won't throw an error
         if (data.interestRate === 0) {
             const principalPerMonth = data.amount / data.tenor;
             for (let i = 1; i <= data.tenor; i++) {
@@ -118,6 +110,7 @@ export class DisbursementsService {
             return schedule;
         }
 
+        // Calculate monthly payment using standard amortization formula
         const pmt = (data.amount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -data.tenor));
 
         let outstandingBalance = data.amount;
