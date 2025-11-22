@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { DisbursementsModule } from './disbursements/disbursements.module';
-import { RepaymentsModule } from './repayments/repayments.module';
-import { RollbacksModule } from './rollbacks/rollbacks.module';
-import { AuditModule } from './audit/audit.module';
-import { LoansModule } from './loans/loans.module';
+import { DisbursementsModule } from './modules/disbursements/disbursements.module';
+import { RepaymentsModule } from './modules/repayments/repayments.module';
+import { RollbacksModule } from './modules/rollbacks/rollbacks.module';
+import { AuditModule } from './modules/audit/audit.module';
+import { LoansModule } from './modules/loans/loans.module';
 import { PrismaModule } from './prisma/prisma.module';
 
-import { HealthController } from './health/health.controller';
+import { HealthController } from './modules/health/health.controller';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
